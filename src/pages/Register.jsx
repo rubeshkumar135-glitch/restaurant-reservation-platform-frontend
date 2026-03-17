@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import API from "../services/api";
 import { useNavigate, Link } from "react-router-dom";
@@ -42,7 +43,7 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-900 via-slate-900 to-black px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black px-4">
 
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8">
 
@@ -99,11 +100,12 @@ function Register() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-3 rounded-lg font-semibold transition duration-300 ${
-              loading
+            className={
+              "w-full py-3 rounded-lg font-semibold transition duration-300 text-white " +
+              (loading
                 ? "bg-gray-500 cursor-not-allowed"
-                : "bg-indigo-600 hover:bg-indigo-700"
-            }`}
+                : "bg-indigo-600 hover:bg-indigo-700")
+            }
           >
             {loading ? "Creating..." : "Register"}
           </button>
@@ -128,3 +130,4 @@ function Register() {
 }
 
 export default Register;
+

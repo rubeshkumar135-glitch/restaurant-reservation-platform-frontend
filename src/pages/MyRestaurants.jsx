@@ -21,7 +21,7 @@ function MyRestaurants() {
 
       const token = localStorage.getItem("token");
 
-      const res = await API.get("/restaurants/owner", {
+      const res = await API.get("/api/restaurants/owner", {
         headers: {
           Authorization: `Bearer ${token}`
         }
