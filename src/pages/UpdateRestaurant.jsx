@@ -7,55 +7,87 @@ function UpdateRestaurant() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    name: "", description: "", address: "", city: "", state: "",
-    zipCode: "", phone: "", email: "", cuisineTypes: [],
-    priceRange: "", photos: [], capacity: ""
+    name: "",
+    description: "",
+    address: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    phone: "",
+    email: "",
+    cuisineTypes: [],
+    priceRange: "",
+    photos: [],
+    capacity: ""
   });
 
-  const [existingPhotos, setExistingPhotos] = useState([]); // To show what's currently there
-  const [previews, setPreviews] = useState([]); // For new uploads
+  const [existingPhotos, setExistingPhotos] = useState([]);
+  const [previews, setPreviews] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetchRestaurant();
-    // Cleanup previews on unmount
     return () => previews.forEach(url => URL.revokeObjectURL(url));
   }, [id]);
+
+  /* ---------------- FETCH ---------------- */
 
   const fetchRestaurant = async () => {
     try {
       const res = await API.get(`/api/restaurants/${id}`);
       const r = res.data;
 
-      setFormData({
-        ...r,
-        photos: [] // Reset photos state to hold only NEW files
-      });
-      setExistingPhotos(r.photos || []); // Store the URLs from Cloudinary
-    } catch (err) {
+    setFormData({
+      name: r?.name ?? "",
+      description: r?.description ?? "",
+      address: r?.location?.address ?? "",
+      city: r?.location?.city ?? "",
+      state: r?.location?.state ?? "",
+      zipCode: r?.location?.zipCode ?? "",
+      phone: r?.phone ?? "",
+      email: r?.email ?? "",
+      cuisineTypes: Array.isArray(r?.cuisineTypes) ? r.cuisineTypes : [],
+      priceRange: r?.priceRange ?? "",
+      capacity: r?.capacity ?? "",
+      photos: []
+    });
+
+    setExistingPhotos(Array.isArray(r?.photos) ? r.photos : []);
+
+    } catch {
       setError("Failed to load restaurant details");
     }
   };
 
+  /* ---------------- INPUT ---------------- */
+
   const handleChange = (e) => {
     const { name, value, options, multiple } = e.target;
+
     if (multiple) {
-      const selected = Array.from(options).filter(o => o.selected).map(o => o.value);
+      const selected = Array.from(options)
+        .filter(o => o.selected)
+        .map(o => o.value);
+
       setFormData(prev => ({ ...prev, [name]: selected }));
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
+  /* ---------------- FILE ---------------- */
+
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
+
     setFormData(prev => ({ ...prev, photos: files }));
 
-    // Generate previews for new files
     const newPreviews = files.map(file => URL.createObjectURL(file));
     setPreviews(newPreviews);
   };
+
+  /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -64,19 +96,21 @@ function UpdateRestaurant() {
 
     try {
       const form = new FormData();
-      
-      // Append all fields except photos (handled separately)
+
       Object.keys(formData).forEach((key) => {
         if (key === "cuisineTypes") {
-          formData.cuisineTypes.forEach(c => form.append("cuisineTypes", c));
+          formData.cuisineTypes.forEach(c =>
+            form.append("cuisineTypes", c)
+          );
         } else if (key !== "photos") {
           form.append(key, formData[key]);
         }
       });
 
-      // Only append new photos if the user actually selected some
       if (formData.photos.length > 0) {
-        formData.photos.forEach(file => form.append("photos", file));
+        formData.photos.forEach(file =>
+          form.append("photos", file)
+        );
       }
 
       await API.put(`/api/restaurants/update/${id}`, form, {
@@ -87,7 +121,8 @@ function UpdateRestaurant() {
       });
 
       alert("Restaurant Updated Successfully!");
-      navigate("/ownerdashboard"); // Redirect after success
+      navigate("/ownerdashboard");
+
     } catch (err) {
       setError(err.response?.data?.message || "Update failed");
     } finally {
@@ -95,67 +130,167 @@ function UpdateRestaurant() {
     }
   };
 
+  /* ---------------- UI ---------------- */
+
   return (
-    <div className="min-h-screen bg-black py-10 px-4 flex justify-center">
-      <div className="w-full max-w-6xl bg-gray-900 rounded-2xl border border-yellow-500 shadow-xl p-10">
-        <h1 className="text-4xl font-bold text-yellow-400 text-center mb-10">Update Restaurant</h1>
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white flex flex-col lg:flex-row">
 
-        {error && <div className="bg-red-500/20 border border-red-500 text-red-500 p-3 rounded mb-6 text-center">{error}</div>}
+      {/* LEFT - IMAGES */}
+      <div className="lg:w-1/2 p-6">
 
-        <form onSubmit={handleSubmit} className="space-y-10">
-          {/* Restaurant Info */}
-          <section>
-            <h2 className="text-yellow-400 text-xl font-semibold mb-4 border-b border-gray-800 pb-2">Basic Info</h2>
-            <div className="grid md:grid-cols-2 gap-5">
-              <input className="inputStyle" name="name" value={formData.name} onChange={handleChange} placeholder="Name" required />
-              <input className="inputStyle" name="description" value={formData.description} onChange={handleChange} placeholder="Description" />
-              <select name="cuisineTypes" className="inputStyle h-32" multiple onChange={handleChange} value={formData.cuisineTypes}>
-                <option value="South Indian">South Indian</option>
-                <option value="North Indian">North Indian</option>
-                <option value="Chinese">Chinese</option>
-                <option value="Italian">Italian</option>
-              </select>
-              <select className="inputStyle" name="priceRange" value={formData.priceRange} onChange={handleChange}>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
+        <h2 className="text-2xl font-bold text-yellow-400 mb-4">
+          Restaurant Preview
+        </h2>
+
+        <p className="text-gray-400 text-sm mb-3">
+          {existingPhotos.length + previews.length} Images
+        </p>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+
+          {/* EMPTY */}
+          {existingPhotos.length === 0 && previews.length === 0 && (
+            <div className="col-span-full text-center text-gray-500 py-10 border border-dashed border-white/20 rounded-xl">
+              No images uploaded 📷
             </div>
-          </section>
+          )}
 
-          {/* Photos Section */}
-          <section>
-            <h2 className="text-yellow-400 text-xl font-semibold mb-4 border-b border-gray-800 pb-2">Photos</h2>
-            
-            {/* Existing Photos */}
-            {existingPhotos.length > 0 && (
-              <div className="mb-4">
-                <p className="text-gray-400 text-sm mb-2">Current Photos:</p>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {existingPhotos.map((url, i) => (
-                    <img key={i} src={url} className="w-20 h-20 object-cover rounded border border-gray-700" alt="Current" />
-                  ))}
-                </div>
-              </div>
-            )}
+          {/* EXISTING */}
+          {existingPhotos.map((url, i) => (
+            <div key={i} className="relative">
+              <img
+                src={url}
+                className="w-full h-32 object-cover rounded-xl border border-white/20"
+              />
+            </div>
+          ))}
 
-            <label className="block text-gray-400 text-sm mb-2">Upload New Photos (Optional):</label>
-            <input className="inputStyle" type="file" multiple onChange={handleFileChange} accept="image/*" />
-            
-            {/* New Previews */}
-            {previews.length > 0 && (
-              <div className="flex gap-2 mt-4">
-                {previews.map((url, i) => (
-                  <img key={i} src={url} className="w-20 h-20 object-cover rounded border border-yellow-500" alt="New Preview" />
-                ))}
-              </div>
-            )}
-          </section>
+          {/* NEW */}
+          {previews.map((url, i) => (
+            <div key={i} className="relative group">
+              <img
+                src={url}
+                className="w-full h-32 object-cover rounded-xl border-2 border-yellow-400"
+              />
 
-          <button type="submit" disabled={loading} className={`w-full font-semibold py-3 rounded-lg transition text-lg ${loading ? "bg-gray-700" : "bg-yellow-500 hover:bg-yellow-600 text-black"}`}>
-            {loading ? "Updating..." : "Save Changes"}
-          </button>
-        </form>
+              {/* REMOVE */}
+              <button
+                type="button"
+                onClick={() => {
+                  const newPreviews = previews.filter((_, index) => index !== i);
+                  const newFiles = formData.photos.filter((_, index) => index !== i);
+
+                  setPreviews(newPreviews);
+                  setFormData(prev => ({ ...prev, photos: newFiles }));
+                }}
+                className="absolute top-1 right-1 bg-red-500 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+
+        </div>
+      </div>
+
+      {/* RIGHT - FORM */}
+      <div className="lg:w-1/2 flex justify-center items-start p-6">
+
+        <div className="w-full max-w-xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
+
+          <h1 className="text-3xl font-bold text-yellow-400 mb-6 text-center">
+            Edit Restaurant
+          </h1>
+
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-400 p-3 rounded mb-4 text-center">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+
+            <input
+              name="name"
+              value={formData.name || ""}
+              onChange={handleChange}
+              placeholder="Restaurant Name"
+              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+            />
+
+            <input
+              name="description"
+              value={formData.description || ""}
+              onChange={handleChange}
+              placeholder="Description"
+              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+            />
+
+            <div className="grid grid-cols-2 gap-4">
+              <input
+                name="city"
+                value={formData.city || ""}
+                onChange={handleChange}
+                placeholder="City"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+              />
+              <input
+                name="state"
+                value={formData.state || ""}
+                onChange={handleChange}
+                placeholder="State"
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+              />
+            </div>
+
+            <select
+              name="priceRange"
+              value={formData.priceRange || ""}
+              onChange={handleChange}
+              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+            >
+              <option value="">Price Range</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+
+            <select
+              name="cuisineTypes"
+              multiple
+              value={formData.cuisineTypes || []}
+              onChange={handleChange}
+              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 h-32"
+            >
+              <option>South Indian</option>
+              <option>North Indian</option>
+              <option>Chinese</option>
+              <option>Italian</option>
+            </select>
+
+            <div
+              onDragOver={(e)=>e.preventDefault()}
+              onDrop={(e)=>{
+                e.preventDefault();
+                handleFileChange({ target: { files: e.dataTransfer.files } });
+              }}
+              className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center"
+            >
+              <p className="text-gray-400 text-sm">Drag & drop images</p>
+              <input type="file" multiple onChange={handleFileChange} className="mt-2" />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3 rounded-xl font-bold text-black
+              ${loading ? "bg-gray-600" : "bg-gradient-to-r from-yellow-400 to-orange-500"}`}
+            >
+              {loading ? "Updating..." : "Save Changes 🚀"}
+            </button>
+
+          </form>
+        </div>
       </div>
     </div>
   );

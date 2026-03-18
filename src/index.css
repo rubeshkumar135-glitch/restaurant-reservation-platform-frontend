@@ -4,4 +4,5 @@
 
 .inputStyle{
   @apply bg-gray-800 border border-gray-700 text-white p-3 rounded-lg w-full outline-none focus:border-yellow-500 placeholder-gray-400;
-}
+} 
+

@@ -40,7 +40,7 @@ function Login() {
       } else if (role === "owner") {
         navigate("/ownerdashboard");
       } else {
-        navigate("/userdashboard");
+        navigate("/");
       }
 
     } catch (err) {
@@ -114,7 +114,7 @@ function Login() {
         <p className="text-center text-gray-300 text-sm mt-6">
           New here?{" "}
           <Link
-            to="/"
+            to="/register"
             className="text-indigo-400 hover:underline font-semibold"
           >
             Create Account

@@ -1,30 +1,58 @@
 import { Link } from "react-router-dom";
+import { FaUtensils, FaStore } from "react-icons/fa";
 
 function OwnerDashboard() {
-
   return (
-    <div className="min-h-screen bg-black text-white p-10">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white px-6 py-10">
 
-      <h1 className="text-4xl font-bold text-yellow-400 mb-10 text-center">
-        Owner Dashboard
-      </h1>
+      {/* Header */}
+      <div className="text-center mb-12">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-yellow-400">
+          Owner Dashboard
+        </h1>
+        <p className="text-gray-400 mt-3 text-sm md:text-base">
+          Manage your restaurants and grow your business 🚀
+        </p>
+      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {/* Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2  gap-8">
 
+        {/* Create Restaurant */}
         <Link
           to="/create-restaurant"
-          className="bg-yellow-500 hover:bg-yellow-600 text-black p-8 rounded-xl text-center font-semibold text-lg shadow-lg"
+          className="group bg-white/10 backdrop-blur-lg border border-white/20 hover:border-yellow-400 
+          p-8 rounded-2xl text-center shadow-xl transition-all duration-300 hover:scale-105"
         >
-          Create Restaurant
+          <div className="flex justify-center mb-4 text-yellow-400 text-4xl group-hover:rotate-6 transition">
+            <FaUtensils />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Create Restaurant</h2>
+          <p className="text-gray-400 text-sm">
+            Add a new restaurant and start receiving bookings
+          </p>
         </Link>
 
+        {/* My Restaurants */}
         <Link
           to="/my-restaurants"
-          className="bg-yellow-500 hover:bg-yellow-600 text-black p-8 rounded-xl text-center font-semibold text-lg shadow-lg"
+          className=" group bg-white/10 backdrop-blur-lg border border-white/20 hover:border-yellow-400 
+          p-8 rounded-2xl text-center shadow-xl transition-all duration-300 hover:scale-105"
         >
-          My Restaurants
+          <div className="flex justify-center mb-4 text-yellow-400 text-4xl group-hover:rotate-6 transition">
+            <FaStore />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">My Restaurants</h2>
+          <p className="text-gray-400 text-sm">
+            View, edit, and manage your restaurant listings
+          </p>
         </Link>
 
+      </div>
+
+      {/* Optional Footer */}
+      <div className="mt-16 text-center text-gray-500 text-sm">
+        © {new Date().getFullYear()} Your Restaurant App
       </div>
 
     </div>

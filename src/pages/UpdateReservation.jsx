@@ -13,6 +13,8 @@ function UpdateReservation() {
     partySize: ""
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -22,7 +24,12 @@ function UpdateReservation() {
 
   const updateReservation = async () => {
 
+    if (!formData.date || !formData.time || !formData.partySize) {
+      return alert("All fields required");
+    }
+
     try {
+      setLoading(true);
 
       const token = localStorage.getItem("token");
 
@@ -30,62 +37,88 @@ function UpdateReservation() {
         `/api/reservations/update/${id}`,
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
-      alert("Reservation updated");
-
+      alert("✅ Reservation updated");
       navigate("/my-reservations");
 
     } catch (error) {
-      console.log(error);
+      alert("Update failed");
+    } finally {
+      setLoading(false);
     }
 
   };
 
   return (
 
-    <div className="min-h-screen bg-black text-white p-10">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 text-white">
 
-      <h1 className="text-2xl text-yellow-400 mb-4">
-        Update Reservation
-      </h1>
+      <div className="w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8">
 
-      <input
-        type="date"
-        name="date"
-        onChange={handleChange}
-        className="inputStyle"
-      />
+        <h1 className="text-3xl font-bold text-center mb-8">
+          ✏️ Edit Reservation
+        </h1>
 
-      <input
-        type="number"
-        name="time"
-        placeholder="Time"
-        onChange={handleChange}
-        className="inputStyle mt-3"
-      />
+        <div className="space-y-5">
 
-      <input
-        type="number"
-        name="partySize"
-        placeholder="Guests"
-        onChange={handleChange}
-        className="inputStyle mt-3"
-      />
+          {/* Date */}
+          <div>
+            <label className="text-sm text-gray-300">📅 Date</label>
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full p-3 mt-1 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-indigo-400 outline-none"
+            />
+          </div>
 
-      <button
-        onClick={updateReservation}
-        className="bg-yellow-500 px-4 py-2 mt-4 rounded"
-      >
-        Update
-      </button>
+          {/* Time */}
+          <div>
+            <label className="text-sm text-gray-300">⏰ Time</label>
+            <input
+              type="time"
+              name="time"
+              value={formData.time}
+              onChange={handleChange}
+              className="w-full p-3 mt-1 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-indigo-400 outline-none"
+            />
+          </div>
+
+          {/* Guests */}
+          <div>
+            <label className="text-sm text-gray-300">👥 Guests</label>
+            <input
+              type="number"
+              name="partySize"
+              value={formData.partySize}
+              onChange={handleChange}
+              min="1"
+              className="w-full p-3 mt-1 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-indigo-400 outline-none"
+            />
+          </div>
+
+          {/* Button */}
+          <button
+            onClick={updateReservation}
+            disabled={loading}
+            className={`w-full py-3 rounded-xl font-semibold transition transform ${
+              loading
+                ? "bg-gray-500"
+                : "bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 shadow-lg"
+            }`}
+          >
+            {loading ? "Updating..." : "🚀 Update Reservation"}
+          </button>
+
+        </div>
+
+      </div>
 
     </div>
-
   );
 }
 

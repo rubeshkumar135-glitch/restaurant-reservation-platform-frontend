@@ -3,28 +3,8 @@ import { useParams, Link } from "react-router-dom";
 import API from "../services/api";
 
 function RestaurantReviews() {
-
   const { restaurantId } = useParams();
-
   const [reviews, setReviews] = useState([]);
-
-  const fetchReviews = async () => {
-    try {
-
-      const token = localStorage.getItem("token");
-
-      const res = await API.get(`/api/reviews/restaurant/${restaurantId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-
-      setReviews(res.data);
-
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   useEffect(() => {
     if (restaurantId) {
@@ -32,94 +12,141 @@ function RestaurantReviews() {
     }
   }, [restaurantId]);
 
-  const deleteReview = async (id) => {
-
-    const confirmDelete = window.confirm("Are you sure you want to delete this review?");
-
-    if (!confirmDelete) return;
-
+  const fetchReviews = async () => {
     try {
-
       const token = localStorage.getItem("token");
 
-      await API.delete(`/api/reviews/delete/${id}`, {
+      const res = await API.get(`/api/reviews/restaurant/${restaurantId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      setReviews(reviews.filter((review) => review._id !== id));
-
-      alert("Review deleted successfully");
-
+      setReviews(res.data || []);
     } catch (error) {
       console.log(error);
     }
   };
 
+  const deleteReview = async (id) => {
+    const confirmDelete = window.confirm("Delete this review?");
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.delete(`/api/reviews/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // ⭐ Stars
+  const renderStars = (rating = 0) => {
+    return (
+      <div className="flex text-yellow-400 text-lg">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span key={star}>
+            {star <= rating ? "★" : "☆"}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 p-4 md:p-8 text-white">
 
-    <div className="min-h-screen bg-linear-to-br from-slate-100 via-indigo-50 to-purple-100 px-4 md:px-10 py-10">
+      <div className="max-w-5xl mx-auto">
 
-      <h2 className="text-3xl font-bold text-indigo-700 mb-8 text-center">
-        Restaurant Reviews
-      </h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
+          ⭐ Restaurant Reviews
+        </h2>
 
-      {reviews.length === 0 ? (
-        <p className="text-gray-500 text-center">No reviews yet</p>
-      ) : (
+        {reviews.length === 0 ? (
+          <p className="text-gray-400 text-center">No reviews yet</p>
+        ) : (
 
-        <div className="max-w-3xl mx-auto space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
 
-          {reviews.map((review) => (
+            {reviews.map((review) => (
 
-            <div
-              key={review._id}
-              className="bg-white shadow-md rounded-xl border border-gray-200 p-6 hover:shadow-lg transition"
-            >
+              <div
+                key={review._id}
+                className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden"
+              >
 
-              <h3 className="text-lg font-semibold text-indigo-600">
-                {review.user?.name}
-              </h3>
+                <div className="p-5">
 
-              <p className="mt-1 text-yellow-500 font-medium">
-                ⭐ {review.rating}
-              </p>
+                  {/* Header */}
+                  <div className="flex justify-between items-center mb-2">
 
-              <p className="mt-2 text-gray-600">
-                {review.comment}
-              </p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-indigo-500 flex items-center justify-center text-sm font-bold">
+                        {review.user?.name?.charAt(0) || "U"}
+                      </div>
 
-              {/* Buttons */}
+                      <h3 className="font-semibold">
+                        {review.user?.name || "User"}
+                      </h3>
+                    </div>
 
-              <div className="flex flex-wrap gap-3 mt-4">
+                    {renderStars(review.rating)}
+                  </div>
 
-                <Link
-                  to={`/update-review/${review._id}`}
-                  className="bg-indigo-500 text-white px-4 py-1.5 rounded-lg hover:bg-indigo-600 transition"
-                >
-                  Edit
-                </Link>
+                  {/* Comment */}
+                  <p className="text-gray-300 mb-4 line-clamp-3">
+                    {review.comment}
+                  </p>
 
-                <button
-                  onClick={() => deleteReview(review._id)}
-                  className="bg-red-500 text-white px-4 py-1.5 rounded-lg hover:bg-red-600 transition"
-                >
-                  Delete
-                </button>
+                  {/* Footer */}
+                  <div className="flex justify-between items-center">
+
+                    <span className="text-xs text-gray-400">
+                      {review.createdAt
+                        ? new Date(review.createdAt).toLocaleDateString()
+                        : ""}
+                    </span>
+
+                    <div className="flex gap-2">
+
+                      <Link
+                        to={`/update-review/${review._id}`}
+                        className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded-md text-sm transition"
+                      >
+                        ✏️ Edit
+                      </Link>
+
+                      <button
+                        onClick={() => deleteReview(review._id)}
+                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition"
+                      >
+                        🗑 Delete
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                </div>
 
               </div>
 
-            </div>
+            ))}
 
-          ))}
+          </div>
 
-        </div>
+        )}
 
-      )}
+      </div>
 
     </div>
-
   );
 }
 

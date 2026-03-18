@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
-
 
 function CreateReservation() {
 
   const { restaurantId } = useParams();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     date: "",
@@ -16,6 +16,15 @@ function CreateReservation() {
   const [availability, setAvailability] = useState(null);
   const [reservation, setReservation] = useState(null);
 
+  // 🔐 AUTH CHECK (same logic)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -23,11 +32,8 @@ function CreateReservation() {
     });
   };
 
-  // Check availability
   const checkAvailability = async () => {
-
     try {
-
       const res = await API.get("/api/reservations/availability", {
         params: {
           restaurantId,
@@ -35,26 +41,16 @@ function CreateReservation() {
           time: formData.time
         }
       });
-
       setAvailability(res.data);
-
     } catch (error) {
-
-      console.log(error);
-
       alert("Failed to check availability");
-
     }
-
   };
 
-  // Create reservation
   const submitReservation = async (e) => {
-
     e.preventDefault();
 
     try {
-
       const token = localStorage.getItem("token");
 
       const res = await API.post(
@@ -66,164 +62,134 @@ function CreateReservation() {
           partySize: formData.partySize
         },
         {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
       setReservation(res.data);
-
-      alert("Reservation created successfully");
-
-      setFormData({
-        date: "",
-        time: "",
-        partySize: ""
-      });
+      setFormData({ date: "", time: "", partySize: "" });
 
     } catch (error) {
-
       alert(error.response?.data?.message || "Reservation failed");
-
     }
-
   };
 
-  // Handle Stripe payment
- const handlePayment = async () => {
-
-  try {
-
-    const res = await API.post(
-      "/api/payment/checkout",
-      {
+  const handlePayment = async () => {
+    try {
+      const res = await API.post("/api/payment/checkout", {
         reservationId: reservation._id,
         price: 20
-      }
-    );
+      });
 
-    // Redirect directly to Stripe checkout page
-    window.location.href = res.data.url;
+      window.location.href = res.data.url;
 
-  } catch (error) {
-
-    console.log(error);
-    alert("Payment failed");
-
-  }
-
-};
+    } catch (error) {
+      alert("Payment failed");
+    }
+  };
 
   return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 text-white">
 
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-slate-100 via-indigo-50 to-purple-100 px-4">
+      <div className="w-full max-w-md">
 
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+        <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl p-8">
 
-        <h1 className="text-2xl font-bold text-indigo-700 mb-6 text-center">
-          Reserve a Table
-        </h1>
+          <h1 className="text-3xl font-bold text-center mb-8 tracking-wide">
+            🍽️ Book Your Table
+          </h1>
 
-        <form onSubmit={submitReservation} className="space-y-4">
+          <form onSubmit={submitReservation} className="space-y-5">
 
-          {/* Date */}
+            {/* Date */}
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-indigo-400 outline-none"
+              required
+            />
 
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            required
-          />
+            {/* Time */}
+            <input
+              type="time"
+              name="time"
+              value={formData.time}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-indigo-400 outline-none"
+              required
+            />
 
-          {/* Time */}
+            {/* Guests */}
+            <input
+              type="number"
+              name="partySize"
+              placeholder="👥 Number of Guests"
+              value={formData.partySize}
+              onChange={handleChange}
+              className="w-full p-3 rounded-xl bg-white/10 border border-white/20 focus:ring-2 focus:ring-indigo-400 outline-none placeholder-gray-300"
+              required
+              min="1"
+            />
 
-          <input
-            type="time"
-            name="time"
-            value={formData.time}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            required
-          />
-
-          {/* Party Size */}
-
-          <input
-            type="number"
-            name="partySize"
-            placeholder="Number of Guests"
-            value={formData.partySize}
-            onChange={handleChange}
-            className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            required
-            min="1"
-          />
-
-          {/* Check Availability */}
-
-          <button
-            type="button"
-            onClick={checkAvailability}
-            className="w-full bg-indigo-500 hover:bg-indigo-600 text-white py-2.5 rounded-lg transition"
-          >
-            Check Availability
-          </button>
-
-          {/* Availability Result */}
-
-          {availability && (
-            <div
-              className={`p-3 rounded-lg text-center text-sm font-medium ${
-                availability.isAvailable
-                  ? "bg-green-100 text-green-700"
-                  : "bg-red-100 text-red-600"
-              }`}
+            {/* Check Availability */}
+            <button
+              type="button"
+              onClick={checkAvailability}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 hover:scale-105 transition transform shadow-lg"
             >
-              {availability.isAvailable
-                ? `Available seats: ${availability.availableSeats}`
-                : "No seats available"}
+              🔍 Check Availability
+            </button>
+
+            {/* Availability */}
+            {availability && (
+              <div
+                className={`text-center p-3 rounded-xl text-sm font-semibold ${
+                  availability.isAvailable
+                    ? "bg-green-500/20 text-green-300"
+                    : "bg-red-500/20 text-red-300"
+                }`}
+              >
+                {availability.isAvailable
+                  ? `✅ ${availability.availableSeats} seats available`
+                  : "❌ No seats available"}
+              </div>
+            )}
+
+            {/* Reserve */}
+            <button
+              type="submit"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:scale-105 transition transform shadow-lg"
+            >
+              🚀 Reserve Now
+            </button>
+
+          </form>
+
+          {/* Payment */}
+          {reservation && (
+            <div className="mt-8 text-center">
+
+              <p className="text-green-400 font-semibold mb-4 text-lg">
+                🎉 Reservation Confirmed!
+              </p>
+
+              <button
+                onClick={handlePayment}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-yellow-400 to-orange-500 text-black font-bold hover:scale-105 transition transform shadow-lg"
+              >
+                💳 Pay Now
+              </button>
+
             </div>
           )}
 
-          {/* Reserve Button */}
-
-          <button
-            type="submit"
-            className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-2.5 rounded-lg transition"
-          >
-            Reserve Table
-          </button>
-
-        </form>
-
-        {/* Payment Section */}
-
-        {reservation && (
-
-          <div className="mt-6 text-center">
-
-            <p className="text-green-600 font-semibold mb-3">
-              Reservation Created Successfully
-            </p>
-
-            <button
-              onClick={handlePayment}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black px-6 py-2 rounded-lg font-semibold"
-            >
-              Pay Now
-            </button>
-
-          </div>
-
-        )}
+        </div>
 
       </div>
 
     </div>
-
   );
 }
 

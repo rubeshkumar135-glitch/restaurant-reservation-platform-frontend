@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
+import { FaUtensils, FaUsers, FaStar, FaCalendarCheck } from "react-icons/fa";
 
 function AdminDashboard() {
-
   const navigate = useNavigate();
 
   const [stats, setStats] = useState({
     restaurants: 0,
     reviews: 0,
     reservations: 0,
-    users: 0
+    users: 0,
   });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchStats();
@@ -19,76 +22,104 @@ function AdminDashboard() {
 
   const fetchStats = async () => {
     try {
+      setLoading(true);
 
       const token = localStorage.getItem("token");
 
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
       const res = await API.get("/api/admin/dashboardstatus", {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      setStats(res.data);
-
+      setStats(res.data || {});
     } catch (err) {
-      console.log(err);
+      console.error(err);
+      setError("Failed to load dashboard data");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Card reusable component
+  const Card = ({ title, value, icon, color, onClick }) => (
+    <div
+      onClick={onClick}
+      className={`bg-gradient-to-r ${color} text-white p-6 rounded-xl cursor-pointer 
+      transform hover:scale-105 transition duration-300 shadow-lg`}
+    >
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold">{title}</h2>
+        <span className="text-2xl">{icon}</span>
+      </div>
+      <p className="text-3xl font-bold mt-4">{value}</p>
+    </div>
+  );
+
   return (
-
     <div className="min-h-screen bg-orange-50 p-4 md:p-8">
-
       <div className="max-w-7xl mx-auto">
 
         <h1 className="text-3xl md:text-4xl font-bold text-orange-600 mb-8 text-center">
           🍽️ Admin Dashboard
         </h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Loading */}
+        {loading && (
+          <p className="text-center text-orange-600 text-lg">Loading...</p>
+        )}
 
-          {/* Restaurants */}
-          <div
-            className="bg-orange-500 text-white p-6 rounded-lg cursor-pointer hover:bg-orange-600 transition transform hover:scale-105 shadow-md"
-            onClick={() => navigate("/admin/restaurants")}
-          >
-            <h2 className="text-lg font-semibold">Restaurants</h2>
-            <p className="text-3xl font-bold mt-3">{stats.restaurants}</p>
+        {/* Error */}
+        {error && (
+          <p className="text-center text-red-500 text-lg">{error}</p>
+        )}
+
+        {/* Cards */}
+        {!loading && !error && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+            <Card
+              title="Restaurants"
+              value={stats.restaurants}
+              icon={<FaUtensils />}
+              color="from-orange-400 to-orange-600"
+              onClick={() => navigate("/admin/restaurants")}
+            />
+
+            <Card
+              title="Reviews"
+              value={stats.reviews}
+              icon={<FaStar />}
+              color="from-yellow-400 to-orange-500"
+              onClick={() => navigate("/admin/reviews")}
+            />
+
+            <Card
+              title="Reservations"
+              value={stats.reservations}
+              icon={<FaCalendarCheck />}
+              color="from-orange-500 to-red-500"
+              onClick={() => navigate("/admin/reservations")}
+            />
+
+            <Card
+              title="Users"
+              value={stats.users}
+              icon={<FaUsers />}
+              color="from-orange-600 to-red-600"
+              onClick={() => navigate("/admin/users")}
+            />
+
           </div>
-
-          {/* Reviews */}
-          <div
-            className="bg-orange-400 text-white p-6 rounded-lg cursor-pointer hover:bg-orange-500 transition transform hover:scale-105 shadow-md"
-            onClick={() => navigate("/admin/reviews")}
-          >
-            <h2 className="text-lg font-semibold">Reviews</h2>
-            <p className="text-3xl font-bold mt-3">{stats.reviews}</p>
-          </div>
-
-          {/* Reservations */}
-          <div
-            className="bg-orange-600 text-white p-6 rounded-lg cursor-pointer hover:bg-orange-700 transition transform hover:scale-105 shadow-md"
-            onClick={() => navigate("/admin/reservations")}
-          >
-            <h2 className="text-lg font-semibold">Reservations</h2>
-            <p className="text-3xl font-bold mt-3">{stats.reservations}</p>
-          </div>
-
-          {/* Users */}
-          <div
-            className="bg-orange-700 text-white p-6 rounded-lg cursor-pointer hover:bg-orange-800 transition transform hover:scale-105 shadow-md"
-            onClick={() => navigate("/admin/users")}
-          >
-            <h2 className="text-lg font-semibold">Users</h2>
-            <p className="text-3xl font-bold mt-3">{stats.users}</p>
-          </div>
-
-        </div>
+        )}
 
       </div>
-
     </div>
-
   );
 }
 
