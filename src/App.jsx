@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import UserProfile from "./pages/UserProfile";
 
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -60,6 +61,8 @@ function Layout() {
       {/* Page Content */}
       <div className={!hideNavbar ? "pt-24" : ""}>
         <Routes>
+          {/* Profile */}
+          <Route path="/profile" element={<UserProfile />} />
 
           {/* Auth */}
           <Route path="/register" element={<Register />} />

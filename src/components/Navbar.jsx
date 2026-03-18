@@ -9,10 +9,7 @@ function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
+  
 
   const isActive = (path) =>
     location.pathname === path ? "text-indigo-400" : "";
@@ -51,12 +48,13 @@ function Navbar() {
           )}
 
           {token ? (
-            <button
-              onClick={handleLogout}
-              className="px-8 py-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500 hover:opacity-90 text-xl shadow-md"
-            >
-              Logout
-            </button>
+            
+            <Link to="/profile" 
+                 className={`relative text-xl hover:text-indigo-400 transition ${isActive("/profile")}`}
+             >Profile
+            </Link>
+
+            
           ) : (
             <>
               <Link

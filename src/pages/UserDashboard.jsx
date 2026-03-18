@@ -147,21 +147,21 @@ function UserDashboard() {
 
                   <Link
                     to={`/reviews/${r._id}`}
-                    className="px-3 md:px-10 py-1 md:py-4 text-xs md:text-xl rounded-full bg-indigo-500 hover:bg-indigo-600"
+                    className="px-3 md:px-10 py-1 md:py-3 text-xs md:text-xl rounded-full bg-indigo-500 hover:bg-indigo-600"
                   >
                     Reviews
                   </Link>
 
                   <Link
                     to={`/create-review/${r._id}`}
-                    className="px-3 md:px-10 py-1 md:py-4 text-xs md:text-xl rounded-full bg-purple-500 hover:bg-purple-600"
+                    className="px-3 md:px-10 py-1 md:py-3 text-xs md:text-xl rounded-full bg-purple-500 hover:bg-purple-600"
                   >
                     Write
                   </Link>
 
                   <Link
                     to={`/create-reservation/${r._id}`}
-                    className="px-3 md:px-10 py-1 md:py-4 text-xs md:text-xl rounded-full bg-emerald-500 hover:bg-emerald-600"
+                    className="px-3 md:px-10 py-1 md:py-3 text-xs md:text-xl rounded-full bg-emerald-500 hover:bg-emerald-600"
                   >
                     Reserve
                   </Link>

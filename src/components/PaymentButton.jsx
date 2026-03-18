@@ -12,7 +12,7 @@ function PaymentButton({ reservationId, price }) {
       const token = localStorage.getItem("token");
 
       const res = await API.post(
-        "/payments/create-checkout-session",
+        "/api/payments/checkout",
         { reservationId, price },
         {
           headers: {
@@ -22,6 +22,8 @@ function PaymentButton({ reservationId, price }) {
       );
 
       const stripe = await stripePromise;
+
+      console.log(res.data.sessionId);
 
       await stripe.redirectToCheckout({
         sessionId: res.data.sessionId
