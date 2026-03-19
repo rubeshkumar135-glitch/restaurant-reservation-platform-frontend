@@ -52,7 +52,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black px-4">
+    <div className="min-h-screen flex  items-center justify-center bg-gradient-to-br from-gray-900 via-slate-900 to-black px-4">
 
       <div className="w-full max-w-md bg-white/10 backdrop-blur-lg border border-white/20 shadow-2xl rounded-2xl p-8">
 
@@ -88,7 +88,7 @@ function Login() {
             {/* Toggle Button */}
             <span
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-3 cursor-pointer text-white text-sm"
+              className="absolute right-3 top-3 cursor-pointer text-black text-sm"
             >
               {showPassword ? "Hide" : "Show"}
             </span>

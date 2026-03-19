@@ -47,7 +47,7 @@ function Layout() {
       {!hideNavbar && <Navbar />}
 
       {/* Page Content */}
-      <div className="pt-20">
+      <div>
         <Routes>
 
           {/* Profile */}
