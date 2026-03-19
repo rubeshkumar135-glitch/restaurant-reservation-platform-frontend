@@ -1,27 +1,31 @@
 import { useState } from "react";
+import { useParams } from "react-router-dom";
 import API from "../services/api";
 
-function OwnerResponse({ reviewId }) {
+function OwnerResponse() {
 
+  const { reviewId } = useParams(); // 🔥 IMPORTANT
   const [message, setMessage] = useState("");
 
   const sendResponse = async () => {
-
     try {
+      const token = localStorage.getItem("token");
 
-      await API.put(`/api/reviews/owner-response/${reviewId}`, {
-        message
-      });
+      await API.post(
+        `/api/reviews/owner-response/${reviewId}`,
+        { message },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       alert("Response sent");
 
     } catch (error) {
-      alert(error.response.data.message);
+      alert(error.response?.data?.message || "Error");
     }
   };
 
   return (
-    <div className="bg-black text-white p-6">
+    <div className="bg-black text-white p-6 min-h-screen">
 
       <h2 className="text-yellow-400 text-xl mb-4">
         Respond to Review
@@ -29,8 +33,9 @@ function OwnerResponse({ reviewId }) {
 
       <textarea
         placeholder="Write response"
+        value={message}
         onChange={(e) => setMessage(e.target.value)}
-        className="inputStyle"
+        className="w-full p-3 rounded bg-white/10"
       />
 
       <button

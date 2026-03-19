@@ -148,31 +148,31 @@ function UserDashboard() {
               <div className="p-4 md:py-8 space-y-3">
                 {/* ✅ DESCRIPTION FIX */}
                 <p className="text-sm md:text-2xl text-gray-300 line-clamp-2">
-                  {r.description || "No description available"}
+                  Description : {r.description || "No description available"}
                 </p>
 
-                <p className="text-sm md:text-xl pt-1">🍴 {r.cuisineTypes}</p>
-                <p className="text-sm md:text-xl pb-3">💰 {r.priceRange}</p>
+                <p className="text-sm md:text-xl pt-1">Cuisine : 🍴 {r.cuisineTypes}</p>
+                <p className="text-sm md:text-xl pb-3">Price Range : 💰 {r.priceRange}</p>
 
                 {/* ACTION BUTTONS */}
                 <div className="flex flex-wrap gap-4">
                   <Link
                     to={`/reviews/${r._id}`}
-                    className="px-3 md:px-8 py-1 md:py-2 text-xs md:text-xl rounded-full bg-indigo-500 hover:bg-indigo-600"
+                    className="px-4  py-1 text-xs md:text-xl rounded-full bg-indigo-500 hover:bg-indigo-600"
                   >
                     Reviews
                   </Link>
 
                   <Link
                     to={`/create-review/${r._id}`}
-                    className="px-3 md:px-8 py-1 md:py-2 text-xs md:text-xl rounded-full bg-purple-500 hover:bg-purple-600"
+                    className="px-4  py-1 text-xs md:text-xl rounded-full bg-purple-500 hover:bg-purple-600"
                   >
                     Write
                   </Link>
 
                   <Link
                     to={`/create-reservation/${r._id}`}
-                    className="px-3 md:px-8 py-1 md:py-2 text-xs md:text-xl rounded-full bg-emerald-500 hover:bg-emerald-600"
+                    className="px-4 py-1 text-xs md:text-xl rounded-full bg-emerald-500 hover:bg-emerald-600"
                   >
                     Reserve
                   </Link>

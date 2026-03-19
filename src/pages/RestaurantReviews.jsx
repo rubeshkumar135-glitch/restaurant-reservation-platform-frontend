@@ -4,60 +4,104 @@ import API from "../services/api";
 
 function RestaurantReviews() {
   const { restaurantId } = useParams();
-  const [reviews, setReviews] = useState([]);
 
+  const [reviews, setReviews] = useState([]);
+  const [replyText, setReplyText] = useState({});
+  const [user, setUser] = useState(null);
+
+  // 🔥 LOAD DATA
   useEffect(() => {
-    if (restaurantId) {
-      fetchReviews();
-    }
+    fetchReviews();
+    getUser();
   }, [restaurantId]);
 
-  const fetchReviews = async () => {
+  // 👤 GET USER
+  const getUser = async () => {
     try {
       const token = localStorage.getItem("token");
 
-      const res = await API.get(`/api/reviews/restaurant/${restaurantId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await API.get("/api/users/profile", {
+        headers: { Authorization: `Bearer ${token}` }
       });
 
+      setUser(res.data);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // 📥 GET REVIEWS
+  const fetchReviews = async () => {
+    try {
+      const res = await API.get(
+        `/api/reviews/restaurant/${restaurantId}`
+      );
+
       setReviews(res.data || []);
+
     } catch (error) {
       console.log(error);
     }
   };
 
+  // ❌ DELETE REVIEW
   const deleteReview = async (id) => {
-    const confirmDelete = window.confirm("Delete this review?");
-    if (!confirmDelete) return;
+    if (!window.confirm("Delete this review?")) return;
 
     try {
       const token = localStorage.getItem("token");
 
       await API.delete(`/api/reviews/delete/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` }
       });
 
       setReviews((prev) => prev.filter((r) => r._id !== id));
+
     } catch (error) {
       console.log(error);
     }
   };
 
-  // ⭐ Stars
-  const renderStars = (rating = 0) => {
-    return (
-      <div className="flex text-yellow-400 text-lg">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <span key={star}>
-            {star <= rating ? "★" : "☆"}
-          </span>
-        ))}
-      </div>
-    );
+  // ⭐ STAR UI
+  const renderStars = (rating = 0) => (
+    <div className="flex text-yellow-400 text-lg">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <span key={star}>
+          {star <= rating ? "★" : "☆"}
+        </span>
+      ))}
+    </div>
+  );
+
+  // 🔥 SEND OWNER REPLY
+  const sendReply = async (reviewId) => {
+
+    if (!replyText[reviewId]?.trim()) {
+      return alert("Enter reply");
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+
+      await API.post(
+        `/api/reviews/owner-response/${reviewId}`,
+        { message: replyText[reviewId] },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // clear input
+      setReplyText((prev) => ({
+        ...prev,
+        [reviewId]: ""
+      }));
+
+      // refresh
+      fetchReviews();
+
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -70,7 +114,9 @@ function RestaurantReviews() {
         </h2>
 
         {reviews.length === 0 ? (
-          <p className="text-gray-400 text-center">No reviews yet</p>
+          <p className="text-gray-400 text-center">
+            No reviews yet
+          </p>
         ) : (
 
           <div className="grid gap-6 md:grid-cols-2">
@@ -79,12 +125,11 @@ function RestaurantReviews() {
 
               <div
                 key={review._id}
-                className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg hover:shadow-2xl transition duration-300 overflow-hidden"
+                className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg"
               >
-
                 <div className="p-5">
 
-                  {/* Header */}
+                  {/* 👤 HEADER */}
                   <div className="flex justify-between items-center mb-2">
 
                     <div className="flex items-center gap-2">
@@ -92,42 +137,80 @@ function RestaurantReviews() {
                         {review.user?.name?.charAt(0) || "U"}
                       </div>
 
-                      <h3 className="font-semibold">
-                        {review.user?.name || "User"}
-                      </h3>
+                      <h3>{review.user?.name}</h3>
                     </div>
 
                     {renderStars(review.rating)}
                   </div>
 
-                  {/* Comment */}
-                  <p className="text-gray-300 mb-4 line-clamp-3">
+                  {/* 💬 COMMENT */}
+                  <p className="text-gray-300 mb-3">
                     {review.comment}
                   </p>
 
-                  {/* Footer */}
+                  {/* ✅ OWNER REPLY SHOW */}
+                  {review.ownerResponse && (
+                    <div className="bg-green-900/40 p-3 rounded mb-3">
+                      <p className="text-green-300 text-sm font-semibold">
+                        Owner Reply:
+                      </p>
+                      <p className="text-gray-200 text-sm">
+                        {review.ownerResponse.message}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* 🔥 OWNER INPUT (ONLY OWNER) */}
+                  {user &&
+                    review.restaurant?.owner?.toString() === user._id &&
+                    !review.ownerResponse && (
+
+                      <div className="mb-3">
+
+                        <input
+                          type="text"
+                          placeholder="Reply to this review..."
+                          value={replyText[review._id] || ""}
+                          onChange={(e) =>
+                            setReplyText({
+                              ...replyText,
+                              [review._id]: e.target.value
+                            })
+                          }
+                          className="w-full p-2 rounded bg-white/10"
+                        />
+
+                        <button
+                          onClick={() => sendReply(review._id)}
+                          className="mt-2 px-3 py-1 bg-green-500 rounded"
+                        >
+                          Reply
+                        </button>
+
+                      </div>
+                    )}
+
+                  {/* 📅 FOOTER */}
                   <div className="flex justify-between items-center">
 
                     <span className="text-xs text-gray-400">
-                      {review.createdAt
-                        ? new Date(review.createdAt).toLocaleDateString()
-                        : ""}
+                      {new Date(review.createdAt).toLocaleDateString()}
                     </span>
 
                     <div className="flex gap-2">
 
                       <Link
                         to={`/update-review/${review._id}`}
-                        className="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded-md text-sm transition"
+                        className="bg-indigo-500 px-3 py-1 rounded text-sm"
                       >
-                        ✏️ Edit
+                        ✏️
                       </Link>
 
                       <button
                         onClick={() => deleteReview(review._id)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition"
+                        className="bg-red-500 px-3 py-1 rounded text-sm"
                       >
-                        🗑 Delete
+                        🗑
                       </button>
 
                     </div>
@@ -135,17 +218,13 @@ function RestaurantReviews() {
                   </div>
 
                 </div>
-
               </div>
 
             ))}
 
           </div>
-
         )}
-
       </div>
-
     </div>
   );
 }
