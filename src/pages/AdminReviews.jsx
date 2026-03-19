@@ -3,9 +3,11 @@ import API from "../services/api";
 import { FaStar, FaTrash } from "react-icons/fa";
 
 function AdminReviews() {
+  const role = localStorage.getItem("role");
+  const isAdmin = role === "admin";
+
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchReviews();
@@ -13,14 +15,7 @@ function AdminReviews() {
 
   const fetchReviews = async () => {
     try {
-      setLoading(true);
-
       const token = localStorage.getItem("token");
-
-      if (!token) {
-        setError("Unauthorized");
-        return;
-      }
 
       const res = await API.get("/api/admin/allreviews", {
         headers: {
@@ -31,7 +26,6 @@ function AdminReviews() {
       setReviews(res.data || []);
     } catch (err) {
       console.error(err);
-      setError("Failed to load reviews");
     } finally {
       setLoading(false);
     }
@@ -50,7 +44,6 @@ function AdminReviews() {
         },
       });
 
-      // instant UI update
       setReviews((prev) => prev.filter((r) => r._id !== id));
     } catch (err) {
       console.error(err);
@@ -58,94 +51,126 @@ function AdminReviews() {
     }
   };
 
-  // ⭐ Star renderer
-  const renderStars = (rating = 0) => {
-    return (
-      <div className="flex text-yellow-400">
-        {[...Array(5)].map((_, i) => (
-          <FaStar key={i} className={i < rating ? "" : "opacity-30"} />
-        ))}
-      </div>
-    );
-  };
+  //  Stars
+  const renderStars = (rating = 0) => (
+    <div className="flex text-yellow-400">
+      {[...Array(5)].map((_, i) => (
+        <FaStar key={i} className={i < rating ? "" : "opacity-30"} />
+      ))}
+    </div>
+  );
+
+  //  THEME
+  const pageBg = isAdmin
+    ? "bg-orange-50"
+    : "bg-gradient-to-br from-black via-gray-900 to-indigo-900";
+
+  const containerBg = isAdmin
+    ? "bg-white text-gray-800"
+    : "bg-white/10 text-white backdrop-blur border border-white/20";
+
+  const headerBg = isAdmin
+    ? "bg-orange-500 text-white"
+    : "bg-indigo-600 text-white";
+
+  const rowHover = isAdmin ? "hover:bg-orange-100" : "hover:bg-white/10";
+
+  const textMuted = isAdmin ? "text-gray-500" : "text-gray-300";
 
   return (
-    <div className="min-h-screen bg-orange-50 p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-
-        <h2 className="text-2xl md:text-3xl font-bold text-orange-600 mb-6 text-center">
+    <div className={`min-h-screen p-4 md:p-8 ${pageBg}`}>
+      <div
+        className={`max-w-7xl mx-auto shadow-lg rounded-lg p-4 md:p-6 ${containerBg}`}
+      >
+        <h2
+          className={`text-xl md:text-3xl font-bold mb-6 text-center ${
+            isAdmin ? "text-orange-600" : "text-white"
+          }`}
+        >
           ⭐ All Reviews
         </h2>
 
-        {/* Loading */}
-        {loading && (
-          <p className="text-center text-orange-600 text-lg">Loading...</p>
-        )}
+        {/* 📱 Responsive wrapper */}
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-200 text-sm md:text-base">
+            {/* HEADER */}
+            <thead>
+              <tr className={headerBg}>
+                <th className="p-2 md:p-3 text-left">User</th>
+                <th className="p-2 md:p-3 text-left">Restaurant</th>
+                <th className="p-2 md:p-3 text-left">Rating</th>
+                <th className="p-2 md:p-3 text-left hidden md:table-cell">
+                  Comment
+                </th>
+                <th className="p-2 md:p-3 text-left hidden md:table-cell">
+                  Date
+                </th>
+                <th className="p-2 md:p-3 text-left">Action</th>
+              </tr>
+            </thead>
 
-        {/* Error */}
-        {error && (
-          <p className="text-center text-red-500">{error}</p>
-        )}
-
-        {/* Empty */}
-        {!loading && reviews.length === 0 && (
-          <p className="text-center text-gray-500">No Reviews Found</p>
-        )}
-
-        {/* Reviews Grid */}
-        {!loading && reviews.length > 0 && (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-
-            {reviews.map((review) => (
-              <div
-                key={review._id}
-                className="bg-white shadow-md rounded-xl overflow-hidden border hover:shadow-xl transition duration-300"
-              >
-
-                <div className="p-5">
-
-                  {/* Header */}
-                  <div className="flex justify-between items-center mb-2">
-                    <h3 className="font-semibold text-orange-600">
+            {/* BODY */}
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="6" className="text-center p-6">
+                    Loading...
+                  </td>
+                </tr>
+              ) : reviews.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="text-center p-6">
+                    No Reviews Found
+                  </td>
+                </tr>
+              ) : (
+                reviews.map((review) => (
+                  <tr
+                    key={review._id}
+                    className={`border-b transition ${rowHover}`}
+                  >
+                    {/* USER */}
+                    <td className="p-2 md:p-3">
                       {review.user?.name || "Unknown"}
-                    </h3>
-                    {renderStars(review.rating)}
-                  </div>
+                    </td>
 
-                  {/* Restaurant */}
-                  <p className="text-sm text-gray-500 mb-2">
-                    🍽️ {review.restaurant?.name || "Unknown"}
-                  </p>
+                    {/* RESTAURANT */}
+                    <td className="p-2 md:p-3">
+                      {review.restaurant?.name || "Unknown"}
+                    </td>
 
-                  {/* Comment */}
-                  <p className="text-gray-700 mb-4 line-clamp-3">
-                    {review.comment}
-                  </p>
+                    {/* RATING */}
+                    <td className="p-2 md:p-3">{renderStars(review.rating)}</td>
 
-                  {/* Footer */}
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-gray-400">
+                    {/* COMMENT (hide mobile) */}
+                    <td className="p-2 md:p-3 max-w-xs truncate hidden md:table-cell">
+                      {review.comment}
+                    </td>
+
+                    {/* DATE (hide mobile) */}
+                    <td
+                      className={`p-2 md:p-3 ${textMuted} hidden md:table-cell`}
+                    >
                       {review.createdAt
                         ? new Date(review.createdAt).toLocaleDateString()
                         : "N/A"}
-                    </span>
+                    </td>
 
-                    <button
-                      onClick={() => deleteReview(review._id)}
-                      className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md text-sm transition"
-                    >
-                      <FaTrash /> Delete
-                    </button>
-                  </div>
-
-                </div>
-
-              </div>
-            ))}
-
-          </div>
-        )}
-
+                    {/* ACTION */}
+                    <td className="p-2 md:p-3">
+                      <button
+                        onClick={() => deleteReview(review._id)}
+                        className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-2 md:px-3 py-1 rounded text-xs md:text-sm"
+                      >
+                        <FaTrash /> Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

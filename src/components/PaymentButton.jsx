@@ -4,11 +4,8 @@ import API from "../services/api";
 const stripePromise = loadStripe("YOUR_STRIPE_PUBLISHABLE_KEY");
 
 function PaymentButton({ reservationId, price }) {
-
   const handlePayment = async () => {
-
     try {
-
       const token = localStorage.getItem("token");
 
       const res = await API.post(
@@ -16,9 +13,9 @@ function PaymentButton({ reservationId, price }) {
         { reservationId, price },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
       const stripe = await stripePromise;
@@ -26,9 +23,8 @@ function PaymentButton({ reservationId, price }) {
       console.log(res.data.sessionId);
 
       await stripe.redirectToCheckout({
-        sessionId: res.data.sessionId
+        sessionId: res.data.sessionId,
       });
-
     } catch (error) {
       console.error(error);
     }

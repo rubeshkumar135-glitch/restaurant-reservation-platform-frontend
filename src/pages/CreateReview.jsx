@@ -3,14 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
 function CreateReview() {
-
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     rating: 0,
     comment: "",
-    photos: null
+    photos: null,
   });
 
   const [preview, setPreview] = useState(null);
@@ -68,7 +67,7 @@ function CreateReview() {
       }
 
       await API.post("/api/reviews/create", form, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       alert("✅ Review submitted");
@@ -78,7 +77,6 @@ function CreateReview() {
 
       // ✅ Redirect after success
       navigate(`/reviews/${restaurantId}`);
-
     } catch (error) {
       alert(error.response?.data?.message || "Error");
     } finally {
@@ -88,18 +86,15 @@ function CreateReview() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 text-white">
-
       <div className="w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8">
-
         <h2 className="text-3xl font-bold text-center mb-6">
           ⭐ Write a Review
         </h2>
 
         <form onSubmit={submitReview} className="space-y-5">
-
           {/* ⭐ Star Rating */}
           <div className="flex justify-center gap-2 text-3xl">
-            {[1,2,3,4,5].map((star) => (
+            {[1, 2, 3, 4, 5].map((star) => (
               <span
                 key={star}
                 onClick={() => handleRating(star)}
@@ -156,11 +151,8 @@ function CreateReview() {
           >
             {loading ? "Submitting..." : "🚀 Submit Review"}
           </button>
-
         </form>
-
       </div>
-
     </div>
   );
 }

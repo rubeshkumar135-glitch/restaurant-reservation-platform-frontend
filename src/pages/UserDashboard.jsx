@@ -34,7 +34,8 @@ function UserDashboard() {
     }
 
     const lower = value.toLowerCase();
-    const ratingMatch = lower.match(/(\d)/);
+
+    const ratingMatch = lower.match(/(\d+)/);
     const ratingValue = ratingMatch ? Number(ratingMatch[1]) : null;
 
     const filtered = allRestaurants.filter((r) => {
@@ -44,13 +45,24 @@ function UserDashboard() {
         ? r.cuisineTypes.join(" ").toLowerCase()
         : (r.cuisineTypes || "").toLowerCase();
 
+      const price = r.priceRange?.toLowerCase() || "";
       const rating = Number(r.averageRating) || 0;
 
       return (
-        (name.includes(lower) ||
-          city.includes(lower) ||
-          cuisine.includes(lower)) &&
-        (ratingValue ? rating >= ratingValue : true)
+        // 🔥 TEXT MATCH
+        name.includes(lower) ||
+        city.includes(lower) ||
+        cuisine.includes(lower) ||
+        // ⭐ RATING MATCH
+        (ratingValue && rating >= ratingValue) ||
+        // 💰 PRICE MATCH
+        (lower.includes("l", "lo", "low") && price === "low") ||
+        (lower.includes("c", "ch", "che", "cheap") && price === "low") ||
+        (lower.includes("m", "me", "med", "medi", "medium") &&
+          price === "medium") ||
+        (lower.includes("h", "hi", "hig", "high") && price === "high") ||
+        (lower.includes("ex", "expen", "expensi", "expensive") &&
+          price === "high")
       );
     });
 
@@ -151,8 +163,12 @@ function UserDashboard() {
                   Description : {r.description || "No description available"}
                 </p>
 
-                <p className="text-sm md:text-xl pt-1">Cuisine : 🍴 {r.cuisineTypes}</p>
-                <p className="text-sm md:text-xl pb-3">Price Range : 💰 {r.priceRange}</p>
+                <p className="text-sm md:text-xl pt-1">
+                  Cuisine : 🍴 {r.cuisineTypes}
+                </p>
+                <p className="text-sm md:text-xl pb-3">
+                  Price Range : 💰 {r.priceRange}
+                </p>
 
                 {/* ACTION BUTTONS */}
                 <div className="flex flex-wrap gap-4">

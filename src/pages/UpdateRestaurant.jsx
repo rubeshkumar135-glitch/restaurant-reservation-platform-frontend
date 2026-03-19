@@ -18,7 +18,7 @@ function UpdateRestaurant() {
     cuisineTypes: [],
     priceRange: "",
     photos: [],
-    capacity: ""
+    capacity: "",
   });
 
   const [existingPhotos, setExistingPhotos] = useState([]);
@@ -28,66 +28,57 @@ function UpdateRestaurant() {
 
   useEffect(() => {
     fetchRestaurant();
-    return () => previews.forEach(url => URL.revokeObjectURL(url));
+    return () => previews.forEach((url) => URL.revokeObjectURL(url));
   }, [id]);
-
-  /* ---------------- FETCH ---------------- */
 
   const fetchRestaurant = async () => {
     try {
       const res = await API.get(`/api/restaurants/${id}`);
       const r = res.data;
 
-    setFormData({
-      name: r?.name ?? "",
-      description: r?.description ?? "",
-      address: r?.location?.address ?? "",
-      city: r?.location?.city ?? "",
-      state: r?.location?.state ?? "",
-      zipCode: r?.location?.zipCode ?? "",
-      phone: r?.phone ?? "",
-      email: r?.email ?? "",
-      cuisineTypes: Array.isArray(r?.cuisineTypes) ? r.cuisineTypes : [],
-      priceRange: r?.priceRange ?? "",
-      capacity: r?.capacity ?? "",
-      photos: []
-    });
+      setFormData({
+        name: r?.name ?? "",
+        description: r?.description ?? "",
+        address: r?.location?.address ?? "",
+        city: r?.location?.city ?? "",
+        state: r?.location?.state ?? "",
+        zipCode: r?.location?.zipCode ?? "",
+        phone: r?.phone ?? "",
+        email: r?.email ?? "",
+        cuisineTypes: Array.isArray(r?.cuisineTypes) ? r.cuisineTypes : [],
+        priceRange: r?.priceRange ?? "",
+        capacity: r?.capacity ?? "",
+        photos: [],
+      });
 
-    setExistingPhotos(Array.isArray(r?.photos) ? r.photos : []);
-
+      setExistingPhotos(Array.isArray(r?.photos) ? r.photos : []);
     } catch {
       setError("Failed to load restaurant details");
     }
   };
-
-  /* ---------------- INPUT ---------------- */
 
   const handleChange = (e) => {
     const { name, value, options, multiple } = e.target;
 
     if (multiple) {
       const selected = Array.from(options)
-        .filter(o => o.selected)
-        .map(o => o.value);
+        .filter((o) => o.selected)
+        .map((o) => o.value);
 
-      setFormData(prev => ({ ...prev, [name]: selected }));
+      setFormData((prev) => ({ ...prev, [name]: selected }));
     } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
-
-  /* ---------------- FILE ---------------- */
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
 
-    setFormData(prev => ({ ...prev, photos: files }));
+    setFormData((prev) => ({ ...prev, photos: files }));
 
-    const newPreviews = files.map(file => URL.createObjectURL(file));
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
     setPreviews(newPreviews);
   };
-
-  /* ---------------- SUBMIT ---------------- */
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -99,30 +90,25 @@ function UpdateRestaurant() {
 
       Object.keys(formData).forEach((key) => {
         if (key === "cuisineTypes") {
-          formData.cuisineTypes.forEach(c =>
-            form.append("cuisineTypes", c)
-          );
+          formData.cuisineTypes.forEach((c) => form.append("cuisineTypes", c));
         } else if (key !== "photos") {
           form.append(key, formData[key]);
         }
       });
 
       if (formData.photos.length > 0) {
-        formData.photos.forEach(file =>
-          form.append("photos", file)
-        );
+        formData.photos.forEach((file) => form.append("photos", file));
       }
 
       await API.put(`/api/restaurants/update/${id}`, form, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data"
-        }
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      alert("Restaurant Updated Successfully!");
+      alert("Restaurant Updated Successfully! ✅");
       navigate("/ownerdashboard");
-
     } catch (err) {
       setError(err.response?.data?.message || "Update failed");
     } finally {
@@ -130,15 +116,11 @@ function UpdateRestaurant() {
     }
   };
 
-  /* ---------------- UI ---------------- */
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white flex flex-col lg:flex-row">
-
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 text-white flex flex-col lg:flex-row">
       {/* LEFT - IMAGES */}
       <div className="lg:w-1/2 p-6">
-
-        <h2 className="text-2xl font-bold text-yellow-400 mb-4">
+        <h2 className="text-2xl font-bold text-indigo-400 mb-4">
           Restaurant Preview
         </h2>
 
@@ -147,41 +129,39 @@ function UpdateRestaurant() {
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-
-          {/* EMPTY */}
           {existingPhotos.length === 0 && previews.length === 0 && (
             <div className="col-span-full text-center text-gray-500 py-10 border border-dashed border-white/20 rounded-xl">
               No images uploaded 📷
             </div>
           )}
 
-          {/* EXISTING */}
           {existingPhotos.map((url, i) => (
-            <div key={i} className="relative">
-              <img
-                src={url}
-                className="w-full h-32 object-cover rounded-xl border border-white/20"
-              />
-            </div>
+            <img
+              key={i}
+              src={url}
+              className="w-full h-38 object-cover rounded-xl border border-white/20"
+            />
           ))}
 
-          {/* NEW */}
           {previews.map((url, i) => (
             <div key={i} className="relative group">
               <img
                 src={url}
-                className="w-full h-32 object-cover rounded-xl border-2 border-yellow-400"
+                className="w-full h-32 object-cover rounded-xl border-2 border-indigo-400"
               />
 
-              {/* REMOVE */}
               <button
                 type="button"
                 onClick={() => {
-                  const newPreviews = previews.filter((_, index) => index !== i);
-                  const newFiles = formData.photos.filter((_, index) => index !== i);
+                  const newPreviews = previews.filter(
+                    (_, index) => index !== i,
+                  );
+                  const newFiles = formData.photos.filter(
+                    (_, index) => index !== i,
+                  );
 
                   setPreviews(newPreviews);
-                  setFormData(prev => ({ ...prev, photos: newFiles }));
+                  setFormData((prev) => ({ ...prev, photos: newFiles }));
                 }}
                 className="absolute top-1 right-1 bg-red-500 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100"
               >
@@ -189,16 +169,13 @@ function UpdateRestaurant() {
               </button>
             </div>
           ))}
-
         </div>
       </div>
 
       {/* RIGHT - FORM */}
       <div className="lg:w-1/2 flex justify-center items-start p-6">
-
         <div className="w-full max-w-xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-
-          <h1 className="text-3xl font-bold text-yellow-400 mb-6 text-center">
+          <h1 className="text-3xl font-bold text-indigo-400 mb-6 text-center">
             Edit Restaurant
           </h1>
 
@@ -209,45 +186,44 @@ function UpdateRestaurant() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-
             <input
               name="name"
-              value={formData.name || ""}
+              value={formData.name}
               onChange={handleChange}
               placeholder="Restaurant Name"
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+              className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3"
             />
 
             <input
               name="description"
-              value={formData.description || ""}
+              value={formData.description}
               onChange={handleChange}
               placeholder="Description"
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+              className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3"
             />
 
             <div className="grid grid-cols-2 gap-4">
               <input
                 name="city"
-                value={formData.city || ""}
+                value={formData.city}
                 onChange={handleChange}
                 placeholder="City"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+                className="bg-black/30 border border-white/20 rounded-lg px-4 py-3"
               />
               <input
                 name="state"
-                value={formData.state || ""}
+                value={formData.state}
                 onChange={handleChange}
                 placeholder="State"
-                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+                className="bg-black/30 border border-white/20 rounded-lg px-4 py-3"
               />
             </div>
 
             <select
               name="priceRange"
-              value={formData.priceRange || ""}
+              value={formData.priceRange}
               onChange={handleChange}
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3"
+              className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3"
             >
               <option value="">Price Range</option>
               <option value="low">Low</option>
@@ -258,9 +234,9 @@ function UpdateRestaurant() {
             <select
               name="cuisineTypes"
               multiple
-              value={formData.cuisineTypes || []}
+              value={formData.cuisineTypes}
               onChange={handleChange}
-              className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 h-32"
+              className="w-full bg-black/30 border border-white/20 rounded-lg px-4 py-3 h-32"
             >
               <option>South Indian</option>
               <option>North Indian</option>
@@ -268,27 +244,25 @@ function UpdateRestaurant() {
               <option>Italian</option>
             </select>
 
-            <div
-              onDragOver={(e)=>e.preventDefault()}
-              onDrop={(e)=>{
-                e.preventDefault();
-                handleFileChange({ target: { files: e.dataTransfer.files } });
-              }}
-              className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center"
-            >
+            <div className="border-2 border-dashed border-white/20 rounded-xl p-6 text-center">
               <p className="text-gray-400 text-sm">Drag & drop images</p>
-              <input type="file" multiple onChange={handleFileChange} className="mt-2" />
+              <input
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="mt-2"
+              />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-3 rounded-xl font-bold text-black
-              ${loading ? "bg-gray-600" : "bg-gradient-to-r from-yellow-400 to-orange-500"}`}
+              className={`w-full py-3 rounded-xl font-bold text-white ${
+                loading ? "bg-gray-600" : "bg-indigo-500 hover:bg-indigo-600"
+              }`}
             >
               {loading ? "Updating..." : "Save Changes 🚀"}
             </button>
-
           </form>
         </div>
       </div>

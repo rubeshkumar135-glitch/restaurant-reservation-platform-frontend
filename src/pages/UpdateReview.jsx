@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
 function UpdateReview() {
-
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -28,7 +27,6 @@ function UpdateReview() {
   };
 
   const updateReview = async () => {
-
     if (!rating) return alert("Select rating");
     if (!comment.trim()) return alert("Comment required");
 
@@ -46,12 +44,11 @@ function UpdateReview() {
       }
 
       await API.put(`/api/reviews/update/${id}`, form, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       alert("✅ Review updated");
       navigate(-1);
-
     } catch (error) {
       alert(error.response?.data?.message || "Update failed");
     } finally {
@@ -60,18 +57,15 @@ function UpdateReview() {
   };
 
   return (
-
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 text-white">
-
       <div className="w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8">
-
         <h2 className="text-3xl font-bold text-center mb-6">
           ✏️ Edit Your Review
         </h2>
 
         {/* ⭐ Rating */}
         <div className="flex justify-center gap-2 text-3xl mb-6">
-          {[1,2,3,4,5].map((star) => (
+          {[1, 2, 3, 4, 5].map((star) => (
             <span
               key={star}
               onClick={() => handleRating(star)}
@@ -127,9 +121,7 @@ function UpdateReview() {
         >
           {loading ? "Updating..." : "🚀 Update Review"}
         </button>
-
       </div>
-
     </div>
   );
 }

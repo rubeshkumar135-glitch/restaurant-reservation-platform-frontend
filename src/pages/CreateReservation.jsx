@@ -3,14 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
 function CreateReservation() {
-
   const { restaurantId } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     date: "",
     time: "",
-    partySize: ""
+    partySize: "",
   });
 
   const [availability, setAvailability] = useState(null);
@@ -28,7 +27,7 @@ function CreateReservation() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -38,8 +37,8 @@ function CreateReservation() {
         params: {
           restaurantId,
           date: formData.date,
-          time: formData.time
-        }
+          time: formData.time,
+        },
       });
       setAvailability(res.data);
     } catch (error) {
@@ -59,16 +58,15 @@ function CreateReservation() {
           restaurantId,
           date: formData.date,
           time: formData.time,
-          partySize: formData.partySize
+          partySize: formData.partySize,
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       setReservation(res.data);
       setFormData({ date: "", time: "", partySize: "" });
-
     } catch (error) {
       alert(error.response?.data?.message || "Reservation failed");
     }
@@ -78,11 +76,10 @@ function CreateReservation() {
     try {
       const res = await API.post("/api/payment/checkout", {
         reservationId: reservation._id,
-        price: 20
+        price: 20,
       });
 
       window.location.href = res.data.url;
-
     } catch (error) {
       alert("Payment failed");
     }
@@ -90,17 +87,13 @@ function CreateReservation() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 text-white">
-
       <div className="w-full max-w-md">
-
         <div className="backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl rounded-3xl p-8">
-
           <h1 className="text-3xl font-bold text-center mb-8 tracking-wide">
             🍽️ Book Your Table
           </h1>
 
           <form onSubmit={submitReservation} className="space-y-5">
-
             {/* Date */}
             <input
               type="date"
@@ -164,13 +157,11 @@ function CreateReservation() {
             >
               🚀 Reserve Now
             </button>
-
           </form>
 
           {/* Payment */}
           {reservation && (
             <div className="mt-8 text-center">
-
               <p className="text-green-400 font-semibold mb-4 text-lg">
                 🎉 Reservation Confirmed!
               </p>
@@ -181,14 +172,10 @@ function CreateReservation() {
               >
                 💳 Pay Now
               </button>
-
             </div>
           )}
-
         </div>
-
       </div>
-
     </div>
   );
 }

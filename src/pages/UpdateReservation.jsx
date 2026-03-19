@@ -3,14 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import API from "../services/api";
 
 function UpdateReservation() {
-
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     date: "",
     time: "",
-    partySize: ""
+    partySize: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -18,12 +17,11 @@ function UpdateReservation() {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const updateReservation = async () => {
-
     if (!formData.date || !formData.time || !formData.partySize) {
       return alert("All fields required");
     }
@@ -33,37 +31,27 @@ function UpdateReservation() {
 
       const token = localStorage.getItem("token");
 
-      await API.put(
-        `/api/reservations/update/${id}`,
-        formData,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      await API.put(`/api/reservations/update/${id}`, formData, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
       alert("✅ Reservation updated");
       navigate("/my-reservations");
-
     } catch (error) {
       alert("Update failed");
     } finally {
       setLoading(false);
     }
-
   };
 
   return (
-
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 text-white">
-
       <div className="w-full max-w-md backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-8">
-
         <h1 className="text-3xl font-bold text-center mb-8">
           ✏️ Edit Reservation
         </h1>
 
         <div className="space-y-5">
-
           {/* Date */}
           <div>
             <label className="text-sm text-gray-300">📅 Date</label>
@@ -113,11 +101,8 @@ function UpdateReservation() {
           >
             {loading ? "Updating..." : "🚀 Update Reservation"}
           </button>
-
         </div>
-
       </div>
-
     </div>
   );
 }

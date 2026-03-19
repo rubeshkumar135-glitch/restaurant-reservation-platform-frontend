@@ -22,8 +22,7 @@ import UploadPhotos from "./pages/uploadPhotos";
 import RestaurantReviews from "./pages/RestaurantReviews";
 import CreateReview from "./pages/CreateReview";
 import UpdateReview from "./pages/UpdateReview";
-import OwnerResponse from "./pages/OwnerResponse";
-import MyReview from "./pages/MyReview"
+import MyReview from "./pages/MyReview";
 
 import CreateReservation from "./pages/CreateReservation";
 import MyReservations from "./pages/MyReservation";
@@ -32,28 +31,15 @@ import UpdateReservation from "./pages/UpdateReservation";
 import Success from "./pages/Successs";
 import Cancel from "./pages/Cancel";
 
-
 /* ---------------- LAYOUT ---------------- */
 
 function Layout() {
   const location = useLocation();
 
-  // 🔥 Smart route matching (production level)
-  const hideNavbarRoutes = [
-    /^\/register$/,
-    /^\/login$/,
-    /^\/admin/,
-    /^\/ownerdashboard/,
-    /^\/create-restaurant/,
-    /^\/my-restaurants/,
-    /^\/update-restaurant/,
-    /^\/upload-photos/,
-    /^\/my-reviews/
-  ];
+  //  Hide navbar for auth pages
+  const hideNavbarRoutes = ["/login", "/register"];
 
-  const hideNavbar = hideNavbarRoutes.some(route =>
-    route.test(location.pathname)
-  );
+  const hideNavbar = hideNavbarRoutes.includes(location.pathname);
 
   return (
     <>
@@ -61,8 +47,9 @@ function Layout() {
       {!hideNavbar && <Navbar />}
 
       {/* Page Content */}
-      <div className={!hideNavbar ? "pt-20" : ""}>
+      <div className="pt-20">
         <Routes>
+
           {/* Profile */}
           <Route path="/profile" element={<UserProfile />} />
 
@@ -91,7 +78,6 @@ function Layout() {
           <Route path="/reviews/:restaurantId" element={<RestaurantReviews />} />
           <Route path="/create-review/:restaurantId" element={<CreateReview />} />
           <Route path="/update-review/:id" element={<UpdateReview />} />
-          <Route path="/owner-response/:reviewId" element={<OwnerResponse />} />
           <Route path="/my-reviews" element={<MyReview />} />
 
           {/* Reservations */}
@@ -108,7 +94,6 @@ function Layout() {
     </>
   );
 }
-
 
 /* ---------------- APP ROOT ---------------- */
 
