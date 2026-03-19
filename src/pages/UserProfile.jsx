@@ -62,29 +62,34 @@ function UserProfile() {
   };
 
   // ✅ UPDATE PROFILE
-  const handleUpdate = async () => {
-    try {
-      const token = localStorage.getItem("token");
+const handleUpdate = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("email", formData.email);
-      if (image) data.append("image", image);
-
-      await API.put("/api/users/update-profile", data, {
+    await API.put(
+      "/api/users/update-profile",
+      {
+        name: formData.name,
+        email: formData.email,
+      },
+      {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
         },
-      });
+      }
+    );
 
-      setEditMode(false);
-      setPreview(null);
-      fetchProfile();
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    alert("Profile updated successfully 🔥");
+
+    setEditMode(false);
+    setPreview(null);
+    fetchProfile();
+
+  } catch (err) {
+    console.log(err.response?.data || err.message);
+    alert("Update failed");
+  }
+};
 
   if (!user)
     return <p className="text-center mt-10 text-lg">Loading...</p>;
@@ -97,8 +102,12 @@ function UserProfile() {
     {/* PROFILE IMAGE */}
     <div className="flex flex-col items-center mb-4">
       <img
-        src={preview || user.profileImage || "https://via.placeholder.com/120"}
-        className="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover mb-2"
+src={
+  preview ||
+  (user.profileImage
+    ? `https://restaurant-reservation-platform-backend.onrender.com/${user.profileImage}`
+    : "https://via.placeholder.com/120")
+}
       />
 
       {editMode && (

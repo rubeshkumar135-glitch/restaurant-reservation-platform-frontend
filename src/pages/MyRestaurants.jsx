@@ -117,35 +117,50 @@ function MyRestaurants() {
               </div>
 
               {/* BODY */}
-              <div className="p-5">
+<div className="p-5">
 
-                {/* BADGES */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {restaurant.cuisineTypes?.map((c,i)=>(
-                    <span key={i} className="text-lg bg-yellow-400/20 text-yellow-400 px-3 py-2 my-3 rounded-full">
-                      {c}
-                    </span>
-                  ))}
-                </div>
+  {/* BADGES */}
+  <div className="flex flex-wrap gap-2 mb-4">
+    {restaurant.cuisineTypes?.map((c, i) => (
+      <span
+        key={i}
+        className="text-sm bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-full"
+      >
+        {c}
+      </span>
+    ))}
+  </div>
 
-                {/* BUTTONS */}
-                <div className="flex gap-3">
-                  <Link
-                    to={`/update-restaurant/${restaurant._id}`}
-                    className="flex-1 text-center bg-yellow-400 text-black py-2 rounded-lg font-semibold hover:scale-105 transition"
-                  >
-                    Edit
-                  </Link>
+  {/* 🔥 ACTION ROW */}
+  <div className="flex gap-2 mb-4">
 
-                  <button
-                    onClick={() => deleteRestaurant(restaurant._id)}
-                    className="flex-1 bg-red-500 py-2 rounded-lg font-semibold hover:scale-105 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
+    {/* REVIEW BUTTON */}
+    <Link
+      to="/my-reviews"
+      className="flex-1 text-center bg-indigo-500 hover:bg-indigo-600 py-2 rounded-lg text-sm font-semibold transition"
+    >
+      💬 Reviews
+    </Link>
 
-              </div>
+    {/* EDIT */}
+    <Link
+      to={`/update-restaurant/${restaurant._id}`}
+      className="flex-1 text-center bg-yellow-400 text-black py-2 rounded-lg font-semibold hover:scale-105 transition"
+    >
+      ✏️ Edit
+    </Link>
+
+    {/* DELETE */}
+    <button
+      onClick={() => deleteRestaurant(restaurant._id)}
+      className="flex-1 bg-red-500 py-2 rounded-lg font-semibold hover:scale-105 transition"
+    >
+      🗑
+    </button>
+
+  </div>
+
+</div>
 
             </div>
 

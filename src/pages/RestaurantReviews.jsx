@@ -148,6 +148,20 @@ function RestaurantReviews() {
                     {review.comment}
                   </p>
 
+                  {/* 🖼 REVIEW IMAGES */}
+{review.photos && review.photos.length > 0 && (
+  <div className="flex gap-2 mt-3 overflow-x-auto">
+    {review.photos.map((img, index) => (
+      <img
+        key={index}
+        src={`https://restaurant-reservation-platform-backend.onrender.com/${img}`}
+        alt="review"
+        className="w-20 h-20 object-cover rounded-lg border border-white/20 hover:scale-105 transition"
+      />
+    ))}
+  </div>
+)}
+
                   {/* ✅ OWNER REPLY SHOW */}
                   {review.ownerResponse && (
                     <div className="bg-green-900/40 p-3 rounded mb-3">

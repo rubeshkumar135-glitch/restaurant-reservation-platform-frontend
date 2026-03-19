@@ -19,6 +19,7 @@ function MyReservations() {
       console.log(error);
     }
   };
+  
 
   useEffect(() => {
     fetchReservations();
@@ -76,7 +77,11 @@ function MyReservations() {
 
                 {/* Image */}
                 <img
-                  src={r.restaurant?.image || "https://via.placeholder.com/200"}
+                  src={
+  r.restaurant?.photos?.[0]
+    ? `https://restaurant-reservation-platform-backend.onrender.com/${r.restaurant.photos[0]}`
+    : "https://picsum.photos/200"
+}
                   alt="restaurant"
                   className="w-full md:w-52 h-40 object-cover rounded-xl shadow-lg"
                 />
@@ -87,8 +92,13 @@ function MyReservations() {
                   <div className="flex justify-between items-center">
 
                     <h2 className="text-2xl font-bold">
-                      {r.restaurant?.name}
+                      {r.restaurant?.name || "No Restaurant"}
                     </h2>
+
+                    <p>
+  📍 {r.restaurant?.location?.city || "Unknown City"}
+</p>
+                    
 
                     <span
                       className={`px-4 py-1 text-xs rounded-full font-semibold ${
@@ -137,7 +147,8 @@ function MyReservations() {
 
             </div>
 
-          ))}
+
+))}
 
         </div>
       )}

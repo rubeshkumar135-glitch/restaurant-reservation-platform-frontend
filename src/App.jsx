@@ -23,6 +23,7 @@ import RestaurantReviews from "./pages/RestaurantReviews";
 import CreateReview from "./pages/CreateReview";
 import UpdateReview from "./pages/UpdateReview";
 import OwnerResponse from "./pages/OwnerResponse";
+import MyReview from "./pages/MyReview"
 
 import CreateReservation from "./pages/CreateReservation";
 import MyReservations from "./pages/MyReservation";
@@ -46,7 +47,8 @@ function Layout() {
     /^\/create-restaurant/,
     /^\/my-restaurants/,
     /^\/update-restaurant/,
-    /^\/upload-photos/
+    /^\/upload-photos/,
+    /^\/my-reviews/
   ];
 
   const hideNavbar = hideNavbarRoutes.some(route =>
@@ -59,7 +61,7 @@ function Layout() {
       {!hideNavbar && <Navbar />}
 
       {/* Page Content */}
-      <div className={!hideNavbar ? "pt-24" : ""}>
+      <div className={!hideNavbar ? "pt-20" : ""}>
         <Routes>
           {/* Profile */}
           <Route path="/profile" element={<UserProfile />} />
@@ -90,6 +92,7 @@ function Layout() {
           <Route path="/create-review/:restaurantId" element={<CreateReview />} />
           <Route path="/update-review/:id" element={<UpdateReview />} />
           <Route path="/owner-response/:reviewId" element={<OwnerResponse />} />
+          <Route path="/my-reviews" element={<MyReview />} />
 
           {/* Reservations */}
           <Route path="/create-reservation/:restaurantId" element={<CreateReservation />} />
