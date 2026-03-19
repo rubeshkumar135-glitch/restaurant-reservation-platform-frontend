@@ -73,7 +73,7 @@ function UserDashboard() {
     <div className="min-h-screen   bg-gradient-to-br from-black via-gray-900 to-indigo-900 px-4 md:px-10 py-20 text-white">
       {/* 🔥 HERO */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold mt-12 mb-4">
           🍽 Discover Amazing Restaurants
         </h1>
         <p className="text-gray-400">
@@ -124,15 +124,7 @@ function UserDashboard() {
                     📍 {r.location?.city}
                   </p>
 
-                  {/* ⭐ Stars */}
-                  {/* <div className="flex text-yellow-400 text-sm md:text-lg mt-1">
-                    {[1, 2, 3, 4, 5].map((star) => {
-                      const rating = Math.round(Number(r.averageRating) || 0);
-                      return (
-                        <span key={star}>{star <= rating ? "★" : "☆"}</span>
-                      );
-                    })}
-                  </div> */}
+                  
                   <div className="flex items-center text-yellow-400 text-sm md:text-lg mt-1">
                     {[1, 2, 3, 4, 5].map((star) => {
                       const rating = Math.round(Number(r.averageRating) || 0);

@@ -98,7 +98,7 @@ function RestaurantReviews() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 p-4 md:p-8 text-white">
       <div className="max-w-5xl mx-auto">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-10">
+        <h2 className="text-3xl md:text-4xl font-bold text-center mt-32 mb-10">
           ⭐ Restaurant Reviews
         </h2>
 
