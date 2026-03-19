@@ -111,7 +111,7 @@ function CreateRestaurant() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 py-10 px-4 flex justify-center">
-      <div className="w-full max-w-6xl bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 md:p-12">
+      <div className="w-full max-w-6xl mt-32 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl p-8 md:p-12">
         <h1 className="text-3xl md:text-4xl font-bold text-indigo-400 text-center mb-10">
           🍽️ Create Restaurant
         </h1>

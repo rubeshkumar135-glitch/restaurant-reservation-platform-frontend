@@ -67,13 +67,13 @@ function AdminDashboard() {
     : "bg-white/10 border border-white/20 backdrop-blur";
 
   return (
-    <div className={`min-h-screen p-4 md:p-8 ${pageBg}`}>
-      <div className={`max-w-7xl mx-auto rounded-lg p-6 ${containerBg}`}>
+    <div className={`min-h-screen md:p-8 ${pageBg}`}>
+      <div className={`max-w-7xl mx-auto rounded-lg mt-32 p-6 ${containerBg}`}>
         {/* TITLE */}
         <h1
-          className={`text-3xl md:text-4xl font-bold text-center mb-8 ${titleColor}`}
+          className={`text-3xl md:text-4xl font-bold text-center mb-8 mt-10 ${titleColor}`}
         >
-          🍽️ Dashboard
+          🍽️ Admin Dashboard
         </h1>
 
         {/* STATS */}

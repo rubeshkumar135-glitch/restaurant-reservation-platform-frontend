@@ -5,7 +5,7 @@ function OwnerDashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 text-white px-6 py-10">
       {/* HEADER */}
-      <div className="text-center mb-12">
+      <div className="text-center mt-32 mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-400">
           Owner Dashboard
         </h1>

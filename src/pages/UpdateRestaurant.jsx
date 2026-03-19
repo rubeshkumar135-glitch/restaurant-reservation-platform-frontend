@@ -117,10 +117,10 @@ function UpdateRestaurant() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-indigo-900 text-white flex flex-col lg:flex-row">
+    <div className="min-h-screen pt-32 bg-gradient-to-br from-black via-gray-900 to-indigo-900 text-white flex flex-col lg:flex-row">
       {/* LEFT - IMAGES */}
       <div className="lg:w-1/2 p-6">
-        <h2 className="text-2xl font-bold text-indigo-400 mb-4">
+        <h2 className="text-2xl font-bold text-indigo-400  mb-4">
           Restaurant Preview
         </h2>
 

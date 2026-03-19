@@ -72,7 +72,7 @@ function AdminRestaurants() {
   return (
     <div className={`min-h-screen p-4 md:p-8 ${pageBg}`}>
       <div
-        className={`max-w-7xl mx-auto shadow-lg rounded-lg p-6 ${containerBg}`}
+        className={`max-w-7xl mx-auto shadow-lg rounded-lg mt-32 p-6 ${containerBg}`}
       >
         <h2
           className={`text-2xl md:text-3xl font-bold mb-6 text-center ${
