@@ -82,7 +82,13 @@ function UserProfile() {
     }
   };
 
-  if (!user) return <p className="text-center mt-10 text-lg">Loading...</p>;
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-indigo-900 text-white">
+        <p className="text-lg animate-pulse">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-black via-gray-900 to-indigo-900">

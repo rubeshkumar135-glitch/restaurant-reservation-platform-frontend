@@ -132,16 +132,18 @@ function Navbar() {
 
         {/* PROFILE */}
         {user && (
-          <div className="flex flex-col items-center p-4 text-white">
-            <img
-              src={
-                user.profileImage ||
-                `https://ui-avatars.com/api/?name=${user.name}`
-              }
-              className="w-16 h-16 rounded-full border-2 border-white mb-2"
-            />
-            <p className="text-sm">{user.name}</p>
-          </div>
+          <Link to="/profile">
+            <div className="flex flex-col items-center p-4 text-white">
+              <img
+                src={
+                  user.profileImage ||
+                  `https://ui-avatars.com/api/?name=${user.name}`
+                }
+                className="w-16 h-16 rounded-full border-2 border-white mb-2"
+              />
+              <p className="text-sm">{user.name}</p>
+            </div>
+          </Link>
         )}
 
         {/* MENU ITEMS */}
