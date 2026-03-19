@@ -105,7 +105,7 @@ function AdminDashboard() {
                         : `https://restaurant-reservation-platform-backend.onrender.com/${r.photos[0]}`
                       : "https://source.unsplash.com/400x300/?restaurant"
                   }
-                  className="w-full h-40 object-cover rounded-md mb-3"
+                  className="w-full h-60 object-cover rounded-md mb-3"
                   onError={(e) => {
                     e.target.src = "https://source.unsplash.com/400x300/?food";
                   }}
