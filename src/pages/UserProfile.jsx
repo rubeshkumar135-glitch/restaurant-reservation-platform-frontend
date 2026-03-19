@@ -66,18 +66,20 @@ const handleUpdate = async () => {
   try {
     const token = localStorage.getItem("token");
 
-    await API.put(
-      "/api/users/update-profile",
-      {
-        name: formData.name,
-        email: formData.email,
+    const data = new FormData(); // 🔥 IMPORTANT
+    data.append("name", formData.name);
+    data.append("email", formData.email);
+
+    if (image) {
+      data.append("profileImage", image); // 🔥 SEND IMAGE
+    }
+
+    await API.put("/api/users/update-profile", data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data", // 🔥 IMPORTANT
       },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    });
 
     alert("Profile updated successfully 🔥");
 
@@ -101,14 +103,19 @@ const handleUpdate = async () => {
 
     {/* PROFILE IMAGE */}
     <div className="flex flex-col items-center mb-4">
-      <img
-src={
-  preview ||
-  (user.profileImage
-    ? `https://restaurant-reservation-platform-backend.onrender.com/${user.profileImage}`
-    : "https://via.placeholder.com/120")
-}
-      />
+<img
+  src={
+    preview ||
+    (user?.profileImage
+      ? user.profileImage.startsWith("http")
+        ? user.profileImage
+        : `https://restaurant-reservation-platform-backend.onrender.com/${user.profileImage}`
+      : "https://ui-avatars.com/api/?name=" + user?.name
+    )
+  }
+  alt="profile"
+  className="w-28 h-28 rounded-full object-cover border-4 border-white"
+/>
 
       {editMode && (
         <input

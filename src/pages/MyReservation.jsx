@@ -77,10 +77,10 @@ function MyReservations() {
 
                 {/* Image */}
                 <img
-                  src={
+src={
   r.restaurant?.photos?.[0]
-    ? `https://restaurant-reservation-platform-backend.onrender.com/${r.restaurant.photos[0]}`
-    : "https://picsum.photos/200"
+    ? r.restaurant.photos[0] // 🔥 DIRECT USE
+    : "https://source.unsplash.com/400x300/?food"
 }
                   alt="restaurant"
                   className="w-full md:w-52 h-40 object-cover rounded-xl shadow-lg"
@@ -94,10 +94,10 @@ function MyReservations() {
                     <h2 className="text-2xl font-bold">
                       {r.restaurant?.name || "No Restaurant"}
                     </h2>
-
-                    <p>
+<p>
   📍 {r.restaurant?.location?.city || "Unknown City"}
 </p>
+                    
                     
 
                     <span
